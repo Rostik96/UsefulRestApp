@@ -1,6 +1,7 @@
 package com.rost.first.controllers;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.rost.first.models.Person;
 import com.rost.first.services.PeopleService;
 import com.rost.first.util.PersonErrorResponse;
+import com.rost.first.util.PersonNotCreatedException;
 import com.rost.first.util.PersonNotFoundException;
 import lombok.AllArgsConstructor;
 
@@ -36,7 +38,10 @@ public class PeopleController {
     @PostMapping
     public ResponseEntity<HttpStatus> create(@RequestBody @Valid Person person, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            //TODO: дописать логику
+            String errorMsg = bindingResult.getFieldErrors().stream()
+                    .map(err -> err.getField() + ": " + err.getDefaultMessage())
+                    .collect(Collectors.joining("; "));
+            throw new PersonNotCreatedException(errorMsg);
         }
         peopleService.save(person);
         // Отправляем HTTP ответ с пустым телом и со статусом 200
@@ -50,11 +55,21 @@ public class PeopleController {
 
     @ExceptionHandler
     private ResponseEntity<PersonErrorResponse> handleException(PersonNotFoundException e) {
+        e.printStackTrace(System.out);
         PersonErrorResponse response = new PersonErrorResponse(
-                "Person with this ID wasn't found!",
+                e.getMessage(),
                 System.currentTimeMillis()
         );
-        e.printStackTrace();
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND); //NOT_FOUND - 404 статус
+    }
+
+    @ExceptionHandler
+    private ResponseEntity<PersonErrorResponse> handleException(PersonNotCreatedException e) {
+        e.printStackTrace(System.out);
+        PersonErrorResponse response = new PersonErrorResponse(
+                e.getMessage(),
+                System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 }
