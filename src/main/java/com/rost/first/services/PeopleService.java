@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.rost.first.models.Person;
 import com.rost.first.repositories.PeopleRepository;
+import com.rost.first.util.PersonNotFoundException;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -20,6 +21,6 @@ public class PeopleService {
     }
 
     public Person findOne(int id) {
-        return peopleRepository.findById(id).orElse(Person.NULL_OBJECT);
+        return peopleRepository.findById(id).orElseThrow(PersonNotFoundException::new);
     }
 }
