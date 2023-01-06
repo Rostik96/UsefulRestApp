@@ -21,7 +21,8 @@ public class PeopleService {
     }
 
     public Person findOne(int id) {
-        return peopleRepository.findById(id).orElseThrow(PersonNotFoundException::new);
+        return peopleRepository.findById(id)
+                .orElseThrow(() -> new PersonNotFoundException("Person with this ID wasn't found!"));
     }
 
     @Transactional
