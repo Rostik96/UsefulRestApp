@@ -10,6 +10,8 @@ import com.rost.first.repositories.PeopleRepository;
 import com.rost.first.util.PersonNotFoundException;
 import lombok.AllArgsConstructor;
 
+import static java.time.LocalDateTime.now;
+
 @AllArgsConstructor
 @Service
 @Transactional(readOnly = true)
@@ -27,6 +29,13 @@ public class PeopleService {
 
     @Transactional
     public void save(Person person) {
+        enrich(person);
         peopleRepository.save(person);
+    }
+
+    private void enrich(Person person) {
+        person.setCreatedAt(now());
+        person.setUpdatedAt(now());
+        person.setCreatedWho("ADMIN");
     }
 }

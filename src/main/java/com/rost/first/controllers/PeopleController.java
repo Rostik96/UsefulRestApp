@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.rost.first.dto.PersonDTO;
 import com.rost.first.models.Person;
 import com.rost.first.services.PeopleService;
 import com.rost.first.util.PersonErrorResponse;
@@ -35,16 +36,24 @@ public class PeopleController {
     }
 
     @PostMapping
-    public ResponseEntity<HttpStatus> createPerson(@RequestBody @Valid Person person, BindingResult bindingResult) {
+    public ResponseEntity<HttpStatus> createPerson(@RequestBody @Valid PersonDTO personDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             String errorMsg = bindingResult.getFieldErrors().stream()
                     .map(err -> err.getField() + ": " + err.getDefaultMessage())
                     .collect(Collectors.joining("; "));
             throw new PersonNotCreatedException(errorMsg);
         }
-        peopleService.save(person);
+        peopleService.save(convertToPerson(personDTO));
         // Отправляем HTTP ответ с пустым телом и со статусом 200
         return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    private Person convertToPerson(PersonDTO personDTO) {
+        Person result = new Person();
+        result.setName(personDTO.getName());
+        result.setAge(personDTO.getAge());
+        result.setEmail(personDTO.getEmail());
+        return result;
     }
 
     @GetMapping("/{id}")
