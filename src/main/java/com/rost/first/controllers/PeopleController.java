@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -29,6 +30,7 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/people")
 public class PeopleController {
     private final PeopleService peopleService;
+    private final ModelMapper modelMapper;
 
     @GetMapping
     public List<Person> index() {
@@ -49,11 +51,7 @@ public class PeopleController {
     }
 
     private Person convertToPerson(PersonDTO personDTO) {
-        Person result = new Person();
-        result.setName(personDTO.getName());
-        result.setAge(personDTO.getAge());
-        result.setEmail(personDTO.getEmail());
-        return result;
+        return modelMapper.map(personDTO, Person.class);
     }
 
     @GetMapping("/{id}")
