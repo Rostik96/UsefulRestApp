@@ -1,5 +1,7 @@
 package com.rost.first.models;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -24,7 +26,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "person")
 public class Person {
-    public static final Person NULL_OBJECT = new Person(0, "John Doe", 0, "nobody@gmail.com");
+    public static final Person NULL_OBJECT = new Person(0, "John Doe", 0, "nobody@gmail.com", LocalDateTime.now(), null, "System");
 
     @Id
     @Column(name = "id")
@@ -44,6 +46,16 @@ public class Person {
     @Email
     @NotEmpty(message = "E-mail should not be empty")
     private String email;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Column(name = "created_who")
+    @NotEmpty
+    private String createdWho;
 
 
     @Override
