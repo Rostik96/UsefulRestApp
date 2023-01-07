@@ -33,8 +33,10 @@ public class PeopleController {
     private final ModelMapper modelMapper;
 
     @GetMapping
-    public List<Person> index() {
-        return peopleService.readAll(); //Jackson под капотом конвертирует объекты в JSON.
+    public List<PersonDTO> index() { //Jackson под капотом конвертирует объекты в JSON.
+        return peopleService.readAll().stream()
+                .map(this::convertToPersonDTO)
+                .toList();
     }
 
     @PostMapping
@@ -54,9 +56,13 @@ public class PeopleController {
         return modelMapper.map(personDTO, Person.class);
     }
 
+    private PersonDTO convertToPersonDTO(Person person) {
+        return modelMapper.map(person, PersonDTO.class);
+    }
+
     @GetMapping("/{id}")
-    public Person getPerson(@PathVariable("id") int id) {
-        return peopleService.findOne(id);
+    public PersonDTO getPerson(@PathVariable("id") int id) {
+        return convertToPersonDTO(peopleService.findOne(id));
     }
 
     @ExceptionHandler
